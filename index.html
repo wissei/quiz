@@ -1,2 +1,20 @@
-<script src="https://cdn.jsdelivr.net/gh/kitao/pyxel/wasm/pyxel.js"></script>
-<pyxel-run name="step.py"></pyxel-run>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>クイズゲーム</title>
+</head>
+<body>
+    <h1>{{ quiz }}</h1>
+    {% if not end %}
+    <form method="post">
+        <input type="text" name="answer" placeholder="答えを入力">
+        <input type="hidden" name="quiz_no" value="{{ quiz_no }}">
+        <input type="hidden" name="score" value="{{ score }}">
+        <input type="submit" value="送信">
+    </form>
+    {% else %}
+    <h2>ゲーム終了: {{ score }}問正解しました。</h2>
+    {% endif %}
+</body>
+</html>
