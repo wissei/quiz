@@ -1,65 +1,33 @@
-import tkinter
-import tkinter.messagebox
+from flask import Flask, render_template, request, redirect, url_for
 
-def message(x,y,t):#影付き文字を表示する関数
-    f = ("Times New Roman",17,"bold")
-    cvs.delete("msg")
-    cvs.create_text(x+1,y+1, text=t,font=f,fill="black",tag="msg")
-    cvs.create_text(x, y, text=t, font=f,fill="yellow",tag="msg")
+app = Flask(__name__)
 
-def button():#ボタンを押したときの処理
-    global quiz_no,score
-    if quiz_no==6: return
-    if quiz_no==-1:
-        quiz_no =0
-        message(512,520,"第"+str(quiz_no+1)+"問\n"+QUIZ[quiz_no])
-        return
-    ans = ent.get()
-    if ans=="":
-        tkinter.messagebox.showinfo("","答えを入力してください。")
-        return
-    if ans==ANS[quiz_no]:
-        tkinter.messagebox.showinfo("","正解です。")
-        score = score + 1
-    else:
-        tkinter.messagebox.showinfo("","違います。答えは"+ANS[quiz_no])
-    quiz_no = quiz_no + 1
-    if quiz_no==6:
-        message(512,520,"お疲れ様でした。")
-        tkinter.messagebox.showinfo("ゲーム終了",str(score)+"問、正解しました。")
-        return
-    ent.delete(0,tkinter.END)
-                
-    message(512,520,"第"+str(quiz_no+1)+"問\n"+QUIZ[quiz_no])     
-root = tkinter.Tk()
-root.title("クイズゲーム")
-root.resizable(False, False)
-cvs = tkinter.Canvas(root, width=1024, height=680)
-bg = tkinter.PhotoImage(file="image/bg.png")
-cvs.create_image(512, 340, image=bg)
-cvs.pack()
-ent = tkinter.Entry(root)
-ent.place(x=300, y=620, width=200, height=30)
-but = tkinter.Button(root, text="OK",command=button)
-but.place(x=600, y=620, width=80, height=30)
-message(512, 520,"クイズを始めます。")
-quiz_no = -1
-score = 0
 QUIZ = [
-"pythonは何に使うもの？\n１算数２プログラミング３トイレ",
-"pythonの変数はなにができる?\n1データの保存２文字の入力３ゲームの破壊",
-"pythonでprintを使うと何ができる?\n１ウィンドウの表示２文字の表示３今度こそゲーム破壊",
-"pythonでif文を使うと何ができる？\n１条件に応じた処理の実行２写真の表示３文字をバグらせる",
-"pythonで配列を使うと何ができる？\n１文字の色を変える２複数のデータの管理３文字を虹色にする",
-"pythonは結局何ができる？\n１アカウントの制作２ウェブやゲームの開発３未来を見る",
-]
-ANS = [
-"2",
-"1",
-"2",
-"1",
-"2",
-"2"
+    "pythonは何に使うもの？1.算数 2.プログラミング 3.トイレ",
+    "pythonの変数はなにができる? 1.データの保存 2.文字の入力 3.ゲームの破壊",
+    "pythonでprintを使うと何ができる? 1.ウィンドウの表示 2.文字の表示 3.今度こそゲーム破壊",
+    "pythonでif文を使うと何ができる? 1.条件に応じた処理の実行 2.写真の表示 3.文字をバグらせる",
+    "pythonで配列を使うと何ができる? 1.文字の色を変える 2.複数のデータの管理 3.文字を虹色にする",
+    "pythonは結局何ができる? 1.アカウントの制作 2.ウェブやゲームの開発 3.未来を見る",
 ]
 
-root.mainloop()
+ANS = ["2", "1", "2", "1", "2", "2"]
+
+@app.route('/', methods=['GET', 'POST'])
+def quiz():
+    if request.method == 'POST':
+        ans = request.form['answer']
+        quiz_no = int(request.form['quiz_no'])
+        score = int(request.form['score'])
+        if ans == ANS[quiz_no]:
+            score += 1
+        quiz_no += 1
+        if quiz_no < len(QUIZ):
+            return render_template('index.html', quiz=QUIZ[quiz_no], quiz_no=quiz_no, score=score)
+        else:
+            return render_template('index.html', quiz="お疲れ様でした。", quiz_no=quiz_no, score=score, end=True)
+    else:
+        return render_template('index.html', quiz=QUIZ[0], quiz_no=0, score=0)
+
+if __name__ == "__main__":
+    app.run(debug=True)
